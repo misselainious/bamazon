@@ -63,21 +63,33 @@ connection.connect(function(err) {
           if (err) throw err;
             console.table(res);
             console.log(divider);
-          
+            connection.end();
       });
   }
 
+
   function viewLow(){
     connection.query("SELECT * FROM products", function(err, res){
+        var lowItems = [];
         if (err) throw err;
+        // console.log(res);
+        // console.log(res[0].stock_quantity);
+        // console.log(res.length);
       for (i=0; i<res.length; i++){
-          if (res.stock_quantity[i] < 5) {
-            console.log(this.stock_quantity);
-          }else{
+          if (res[i].stock_quantity < 5) {
+            lowItems.push(res[i]);
+          }
+
+      }
+      if(lowItems.length>0){
+      console.log("Looks like you're low on the following items:")
+      console.table(lowItems);
+      connection.end();
+      }
+        else{
               console.log("Looks like you have a good supply of everything!")
               connection.end();
           }
-      }
   });
   }
 
@@ -100,31 +112,30 @@ connection.connect(function(err) {
           }
         ])
         .then(function(answer){
-            existingStock = parseInt(res[0].stock_quantity);
+            existingStock = res[answer.choice-1].stock_quantity;
             numAdd = parseInt(answer.numberToAdd);
             newStock = existingStock + numAdd;
             var chosenItem;
-            chosenItem = answer.choice;
+            chosenItem = parseInt(answer.choice);
+            console.log(existingStock, numAdd, newStock, chosenItem);
         
                 connection.query(
                     "UPDATE products SET ? WHERE ?",
-                    [
+                    
                         {
                             stock_quantity: newStock
                         },
                         {
                             item_id: chosenItem
-                        }
-                    ], 
+                        },
+                    
                     function(err){
                         if (err) throw err;
                     }
-                )
-                connection.end();
-            
-        })
-        
+                )          
+        })     
     })
+    // connection.end();
   };
 
   function newProduct(){
