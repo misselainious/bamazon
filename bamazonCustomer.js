@@ -54,6 +54,8 @@ function chooseItem() {
             var chosenItem = answer.choice-1;
             orderTotal = answer.numberToBuy*res[chosenItem].price;
             newStock = res[chosenItem].stock_quantity-answer.numberToBuy;
+            prevSales = res[chosenItem].product_sales;
+            var newSales = prevSales + orderTotal;
             // console.log(chosenItem, orderTotal, newStock);
             
             
@@ -62,10 +64,13 @@ function chooseItem() {
             }else{
                 console.log("Thanks for your purchase of " + answer.numberToBuy + " " + res[chosenItem].product_name + " at Bamazon! Your order total is: $"+ orderTotal);
                 connection.query(
-                    "UPDATE products SET ? WHERE ?",
+                    "UPDATE products SET ?,? WHERE ?",
                     [
                         {
                             stock_quantity: newStock
+                        },
+                        {
+                            product_sales: newSales
                         },
                         {
                             item_id: answer.choice
