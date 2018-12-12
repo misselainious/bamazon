@@ -6,7 +6,7 @@ var divider = "***---------------------------------***";
 var orderTotal = 0;
 var newStock = 0;
 
-//connecting to database
+//variable for connecting to database
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -19,15 +19,15 @@ var connection = mysql.createConnection({
     database: "bamazon"
 });
 
-
+//connects to the database
 connection.connect(function (err) {
     if (err) throw err;
-    // console.log("connected as id " + connection.threadId);
     console.log(divider);
     console.log("Welcome to Bamazon! Your one stop shop for all your Holiday Shopping. \nPlease browse our available products:")
     displayItems();
 });
 
+//Shows Items for sale in a table with item id, product name and price
 function displayItems() {
     connection.query("SELECT item_id,product_name,price FROM products", function (err, res) {
         if (err) throw err;
@@ -38,6 +38,7 @@ function displayItems() {
     });
 }
 
+//allows user to choose an item by id and select quantity for purchase. 
 function chooseItem() {
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
@@ -52,20 +53,26 @@ function chooseItem() {
                 message: "How many would you like?"
             }
         ]).then(function (answer) {
-            // var chosenItem;
+            //variable for user choice
             var chosenItem = answer.choice - 1;
+            //variable for order total
             orderTotal = answer.numberToBuy * res[chosenItem].price;
+            //variable for new stock quantity after user purchase
             newStock = res[chosenItem].stock_quantity - answer.numberToBuy;
+            //variable for storing previous sales of the item
             prevSales = res[chosenItem].product_sales;
+            //variable for storing updated sales of item after user purchase
             var newSales = prevSales + orderTotal;
-            // console.log(chosenItem, orderTotal, newStock);
 
-
-            if (answer.numberToBuy > res[0].stock_quantity) {
-                console.log("Oh, sorry, Santa just came by so we don't have enough of that item to fill your order!");
+            //If there is not enough stock to fill the order, user is prompted to choose another item or quantity.
+            if (answer.numberToBuy > res[chosenItem].stock_quantity) {
+                console.log("Oh, sorry, Santa just came by so we don't have enough of that item to fill your order! \nPlease choose a different item.");
+                chooseItem();
+            //If there is sufficient stock, user's order is filled and they are shown what they purchased, quantity, and order total.
             } else {
                 console.log("Thanks for your purchase of " + answer.numberToBuy + " " + res[chosenItem].product_name + " at Bamazon! Your order total is: $" + orderTotal);
                 connection.query(
+                    //Updated the database after purchase.
                     "UPDATE products SET ?,? WHERE ?",
                     [{
                             stock_quantity: newStock
@@ -90,49 +97,3 @@ function chooseItem() {
     })
 
 }
-//         .then(function(answer){
-//             console.log(answer);
-//             ;
-//             // console.log(res[chosenItem]);
-//             var chosenItem = parseFloat(answer.choice-1);
-//             var qty = parseFloat(answer.numberToBuy-1);
-//             var orderTotal = res[chosenItem].price*answer.numberToBuy;
-//             var prevSales = res[chosenItem].product_sales;
-//             var newSales = prevSales+orderTotal;
-//             var newStock = res[chosenItem].stock_quantity-answer.numberToBuy;
-//             console.log("choices", orderTotal, prevSales, newSales, newStock);
-
-//             // prevSales = res[chosenItem].product_sales;
-//             // orderTotal = res[chosenItem].numberToBuy*res[chosenItem].price;
-//             // newStock = res[chosenItem].stock_quantity-res[chosenItem].numberToBuy;
-//             // newSales = prevSales + orderTotal;
-//             // console.log("new sales: ", newSales);       
-
-
-//             if(answer.numberToBuy > answer.choice.stock_quantity){
-//                 console.log("Oh, sorry, Santa just came by so we don't have enough of that item to fill your order!");
-//             }else{
-//                 console.log("Thanks for shopping at Bamazon! Your order total is: $"+ orderTotal);
-//                 connection.query(
-//                     "UPDATE products SET ?,? WHERE ?",
-//                     [
-//                         {
-//                             stock_quantity: newStock
-//                         },
-//                         {
-//                             product_sales: orderTotal
-//                         },
-//                         {
-//                             item_id: chosenItem
-//                         }
-//                     ], 
-//                     function(err){
-//                         if (err) throw err;
-//                     }
-//                 )
-//                 connection.end();
-//             }
-//         })
-
-//     })
-// }
