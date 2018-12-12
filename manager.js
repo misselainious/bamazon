@@ -29,7 +29,7 @@ connection.connect(function(err) {
       type: 'list',
       message: 'What do you need to do today?',
       name: 'command',
-      choices: ['View products for sale', 'View low inventory', 'Add to invnetory', 'Add new product'],
+      choices: ['View products for sale', 'View low inventory', 'Add to inventory', 'Add new product'],
       validate: function(answer){
           if(answer.length<1){
               return 'You must choose an option, you are at work after all...'
@@ -48,7 +48,7 @@ connection.connect(function(err) {
           viewLow();
           break;
 
-          case 'Add to invnetory':
+          case 'Add to inventory':
           addInventory();
           break;
 
@@ -114,10 +114,10 @@ connection.connect(function(err) {
         ])
         .then(function(answer){
             var chosenItem = parseFloat(answer.choice);
-            existingStock = parseFloat(res[chosenItem].stock_quantity);
-            numAdd = parseFloat(answer.numberToAdd);
-            newStock = parseFloat(existingStock + numAdd);
-
+            var existingStock = parseFloat(res[chosenItem-1].stock_quantity);
+            var numAdd = parseFloat(answer.numberToAdd);
+            var newStock = parseFloat(existingStock + numAdd);
+            // console.log(existingStock, numAdd, newStock, chosenItem);
                 connection.query(
                     "UPDATE products SET ? WHERE ?",
                     
