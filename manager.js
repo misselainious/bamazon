@@ -72,9 +72,7 @@ connection.connect(function(err) {
     connection.query("SELECT * FROM products", function(err, res){
         var lowItems = [];
         if (err) throw err;
-        // console.log(res);
-        // console.log(res[0].stock_quantity);
-        // console.log(res.length);
+
       for (i=0; i<res.length; i++){
           if (res[i].stock_quantity < 5) {
             lowItems.push(res[i]);
@@ -95,7 +93,10 @@ connection.connect(function(err) {
 
 
   function addInventory(){
-    displayItems();
+    connection.query("SELECT * FROM products", function(err, res){
+        if (err) throw err;
+          console.table(res);        
+    });
     console.log("Please select an item_id to add inventory for");
     connection.query("SELECT * FROM products", function(err, res) {
         if (err) throw err;
@@ -112,30 +113,29 @@ connection.connect(function(err) {
           }
         ])
         .then(function(answer){
-            existingStock = res[answer.choice-1].stock_quantity;
-            numAdd = parseInt(answer.numberToAdd);
-            newStock = existingStock + numAdd;
-            var chosenItem;
-            chosenItem = parseInt(answer.choice);
-            console.log(existingStock, numAdd, newStock, chosenItem);
-        
+            var chosenItem = parseFloat(answer.choice);
+            existingStock = parseFloat(res[chosenItem].stock_quantity);
+            numAdd = parseFloat(answer.numberToAdd);
+            newStock = parseFloat(existingStock + numAdd);
+
                 connection.query(
                     "UPDATE products SET ? WHERE ?",
                     
-                        {
+                       [ {
                             stock_quantity: newStock
                         },
                         {
                             item_id: chosenItem
-                        },
-                    
+                        }
+                    ],
                     function(err){
                         if (err) throw err;
+                        connection.end();
                     }
                 )          
         })     
     })
-    // connection.end();
+    
   };
 
   function newProduct(){
