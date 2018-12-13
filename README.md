@@ -1,5 +1,7 @@
 Bamazon App 
 
+View the video overview here: https://drive.google.com/file/d/1qapKkpjywGXurKrc994IlFybc_S90ir8/view
+
 This app is an online marketplace that includes both customer-side and manager-side functionality integrating SQL database using MySQL. It is broken down into 3 files:
 
 bamazonCustomer.js - allows a customer to view items by product name and price, select an item and quantity and displays what they bought with the total purchase price. If there is not enough inventory to support the sale, the user will be notified.

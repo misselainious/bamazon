@@ -48,9 +48,8 @@ connection.connect(function(err) {
         }
     })
     }
-
   function profit(){
-    connection.query("SELECT departments.department_id, products.department_name, products.product_sales, departments.over_head_costs, (products.product_sales - departments.over_head_costs) AS total_profit FROM products INNER JOIN departments ON products.department_name=departments.department_name GROUP BY department_name ORDER BY SUM(product_sales) DESC", function (err, res) {
+    connection.query("SELECT departments.department_id, departments.department_name, products.product_sales, departments.over_head_costs, (products.product_sales - departments.over_head_costs) AS total_profit FROM products INNER JOIN departments ON products.department_name=departments.department_name GROUP BY department_name ORDER BY SUM(product_sales) DESC", function (err, res) {
         if (err) throw err;
 
         console.table(res);
@@ -59,7 +58,38 @@ connection.connect(function(err) {
     });
   }
 
+
+
   function createDepartment(){
-    console.log("Yeah...working on that...");
-    connection.end();
+
+    inquirer.prompt([
+      {
+          name: 'department',
+          type: 'input',
+          message: 'Enter new department name'
+      },
+      {
+          name: 'ohc',
+          type: 'input',
+          message: 'What are the over head costs for this department?'
+      }
+  ])
+  .then(function(answer){
+      connection.query(
+          "INSERT INTO departments SET ?",
+          {
+              department_name: answer.department,
+              over_head_costs: answer.ohc
+          },
+          function(err){
+              if (err) throw err;
+              console.log("Your department was added successfully!")
+              connection.end();
+          }
+          
+      )
+  })
+    // connection.end();
   }
+
+
